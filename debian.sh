@@ -98,9 +98,9 @@ clear
 #########################
 # USERNAME
 rm -f /usr/bin/user
-username=$(curl https://raw.githubusercontent.com/prem-sc/Regist/MONSTER/afk | grep $MYIP | awk '{print $2}')
+username=$(curl https://raw.githubusercontent.com/Valkry8/Regist/MONSTER/afk | grep $MYIP | awk '{print $2}')
 echo "$username" >/usr/bin/user
-expx=$(curl https://raw.githubusercontent.com/prem-sc/Regist/MONSTER/afk | grep $MYIP | awk '{print $3}')
+expx=$(curl https://raw.githubusercontent.com/Valkry8/Regist/MONSTER/afk | grep $MYIP | awk '{print $3}')
 echo "$expx" >/usr/bin/e
 # DETAIL ORDER
 username=$(cat /usr/bin/user)
@@ -124,7 +124,7 @@ mai="datediff "$Exp" "$DATE""
 Info="(${green}Active${NC})"
 Error="(${RED}ExpiRED${NC})"
 today=`date -d "0 days" +"%Y-%m-%d"`
-Exp1=$(curl https://raw.githubusercontent.com/prem-sc/Regist/MONSTER/afk | grep $MYIP | awk '{print $4}')
+Exp1=$(curl https://raw.githubusercontent.com/Valkry8/Regist/MONSTER/afk | grep $MYIP | awk '{print $4}')
 if [[ $today < $Exp1 ]]; then
 sts="${Info}"
 else
@@ -312,8 +312,8 @@ clear
 clear
 # // GANTI PASSWORD DEFAULT
 restart_system() {
-    USRSC=$(wget -qO- https://raw.githubusercontent.com/prem-sc/Regist/MONSTER/afk | grep $ipsaya | awk '{print $2}')
-    EXPSC=$(wget -qO- https://raw.githubusercontent.com/prem-sc/Regist/MONSTER/afk | grep $ipsaya | awk '{print $3}')
+    USRSC=$(wget -qO- https://raw.githubusercontent.com/Valkry8/Regist/MONSTER/afk | grep $ipsaya | awk '{print $2}')
+    EXPSC=$(wget -qO- https://raw.githubusercontent.com/Valkry8/Regist/MONSTER/afk | grep $ipsaya | awk '{print $3}')
     TIMEZONE=$(printf '%(%H:%M:%S)T')
     TEXT="
 <code>────────────────────</code>
@@ -533,7 +533,7 @@ print_success "Password SSH"
 function udp_mini(){
 clear
 print_install "Memasang Service Limit Quota"
-wget raw.githubusercontent.com/arifkenza09/vip/main/limit/limit.sh && chmod +x limit.sh && ./limit.sh
+wget https://raw.githubusercontent.com/Valkry8/wiz4rd/MONSTER/limit/limit.sh && chmod +x limit.sh && ./limit.sh
 
 cd
 wget -q -O /usr/bin/limit-ip "${REPO}limit/limit-ip"
