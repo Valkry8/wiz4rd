@@ -124,7 +124,7 @@ mai="datediff "$Exp" "$DATE""
 Info="(${green}Active${NC})"
 Error="(${RED}ExpiRED${NC})"
 today=`date -d "0 days" +"%Y-%m-%d"`
-Exp1=$(curl https://raw.githubusercontent.com/Valkry8/Regist/refs/heads/main/afk?token=GHSAT0AAAAAAEFF3PRF64Z3U3CBME25K2VS2TXXKOA | grep $MYIP | awk '{print $4}')
+Exp1=$(curl https://raw.githubusercontent.com/Valkry8/Regist/refs/heads/MONSTER/afk | grep $MYIP | awk '{print $4}')
 if [[ $today < $Exp1 ]]; then
 sts="${Info}"
 else
