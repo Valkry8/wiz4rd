@@ -1,7 +1,7 @@
 #!/bin/bash
-# Edition : Stable Edition V3.0
-# Auther  : Geo Project
-# (C) Copyright 2023
+# Edition : Stable Edition V3.9
+# Auther  : AMIN WEB PANEL
+# (C) Copyright 2026
 # =========================================
 
 red='\e[1;31m'
@@ -169,7 +169,7 @@ Install_BBR
 Optimize_Parameters
 rm -f /root/bbr.sh >/dev/null 2>&1
 echo -e '\e[32;1m============================================================\e[0m'
-echo -e '\e[0;32m                  Installation Success!                     \e[0m'
+echo -e '\e[0;32m                  Oke          Success!                     \e[0m'
 echo -e '\e[32;1m============================================================\e[0m'
 sleep 3
 #fi
