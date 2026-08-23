@@ -31,7 +31,7 @@ Repo1="https://raw.githubusercontent.com/Valkry8/Regist/MONSTER/afk"
 export MYIP=$( curl -s https://ipinfo.io/ip/ )
 SELLER=$(curl -sS ${Repo1}ip | grep $MYIP | awk '{print $2}')
 Exp100=$(curl -sS ${Repo1}ip | grep $MYIP | awk '{print $3}')
-data_ip="https://raw.githubusercontent.com/valkry7/Regist/MONSTER/afk"
+data_ip="https://raw.githubusercontent.com/valkry8/Regist/MONSTER/afk"
 d2=$(date -d "$date_list" +"+%s")
 d1=$(date -d "$Exp" +"+%s")
 dayleft=$(( ($d1 - $d2) / 86400 ))
@@ -51,9 +51,9 @@ BGX="\033[42m"
 END='\e[0m'
 AKTIF="VERIFIED"
 TOKEN="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"
-REPO="https://github.com/nishikazekazata/izin.git"
-EMAIL="nishikazekazata@gmail.com"
-USER="nishikazekazata"
+REPO="github.com/Valkry8/Regist.git"
+EMAIL="andinoho456@gmail.com"
+USER="VALKRY8"
 
 
 add-ip() {
@@ -115,8 +115,8 @@ URL="https://api.telegram.org/bot$KEY/sendMessage"
     git add . &> /dev/null
     git commit -m m &> /dev/null
     git branch -M main &> /dev/null
-    git remote add origin https://github.com/nishikazekazata/izin
-    git push -f https://${TOKEN}@github.com/nishikazekazata/izin.git &> /dev/null
+    git remote add origin https://github.com/Valkry8/Regist
+    git push -f https://${TOKEN}@github.com/Valkry8/Regist.git &> /dev/null
     rm -rf /root/ipvps
     clear
     sleep 1
@@ -189,8 +189,8 @@ URL="https://api.telegram.org/bot$KEY/sendMessage"
     git add . &> /dev/null
     git commit -m m &> /dev/null
     git branch -M main &> /dev/null
-    git remote add origin https://github.com/nishikazekazata/izin
-    git push -f https://${TOKEN}@github.com/nishikazekazata/izin.git &> /dev/null
+    git remote add origin https://github.com/Valkry8/Regist
+    git push -f https://${TOKEN}@github.com/Valkry8/Regist.git &> /dev/null
     rm -rf /root/ipvps
     clear
     sleep 1
@@ -261,8 +261,8 @@ URL="https://api.telegram.org/bot$KEY/sendMessage"
     git add . &> /dev/null
     git commit -m m &> /dev/null
     git branch -M main &> /dev/null
-    git remote add origin https://github.com/nishikazekazata/izin
-    git push -f https://${TOKEN}@github.com/nishikazekazata/izin.git &> /dev/null
+    git remote add origin https://github.com/Valkry8/Regist
+    git push -f https://${TOKEN}@github.com/Valkry8/Regist.git &> /dev/null
     rm -rf /root/ipvps
     clear
     sleep 1
