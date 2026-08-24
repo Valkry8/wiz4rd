@@ -1,5 +1,5 @@
 #!/bin/bash
-# Edition : Stable Edition V3.9
+# Edition : Stable Edition V10.1
 # Auther  : AMIN WEB PANEL
 # (C) Copyright 2026
 # =========================================
