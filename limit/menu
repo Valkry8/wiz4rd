@@ -153,7 +153,7 @@ else
    status_dropbear="${z}❌${NC} "
 fi
 # // UPDATE / REVISI all menu
-REVISI="https://raw.githubusercontent.com/prem-sc/wiz4rd/MONSTER/"
+REVISI="https://raw.githubusercontent.com/Valkry8/wiz4rd/MONSTER/"
 
 # // INFO CREATE ACCOUNT
 # \\ Vless account //
