@@ -36,7 +36,7 @@ fun_bar() {
 }
 res1() {
     wget https://raw.githubusercontent.com/Valkry8/wiz4rd/MONSTER/limit/menu.zip
-    wget -q -O /usr/bin/enc "https://raw.githubusercontent.com/Valkry8/wiz4rd/MONSTER/epro/epro" ; chmod +x /usr/bin/enc
+    wget -q -O /usr/bin/enc "https://raw.githubusercontent.com/Valkry8/wiz4rd/MONSTER/limit/menu.zip ; chmod +x /usr/bin/enc
     7z e -paskykenza123 menu.zip
     unzip menu.zip
     chmod +x menu/*
