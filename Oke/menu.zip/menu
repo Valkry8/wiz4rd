@@ -40,12 +40,12 @@ echo ""
 #########################
 # // USERNAME IZIN IPP
 rm -f /usr/bin/user
-username=$(curl -sS https://raw.githubusercontent.com/prem-sc/Regist/MONSTER/afk | grep $MYIP | awk '{print $2}')
+username=$(curl -sS https://raw.githubusercontent.com/Valkry8/Regist/MONSTER/afk | grep $MYIP | awk '{print $2}')
 echo "$username" >/usr/bin/user
 
 # // VALIDITY
 rm -f /usr/bin/e
-valid=$(curl -sS https://raw.githubusercontent.com/prem-sc/Regist/MONSTER/afk | grep $MYIP | awk '{print $3}')
+valid=$(curl -sS https://raw.githubusercontent.com/Valkry8/Regist/MONSTER/afk | grep $MYIP | awk '{print $3}')
 echo "$valid" > /usr/bin/e
 
 # // DETAIL ORDER IZIN IP
@@ -75,7 +75,7 @@ Info="${green}Activated${NC}"
 Error="${RED}Expired ${NC}"
 #//
 today=`date -d "0 days" +"%Y-%m-%d"`
-Exp1=$(curl -sS https://raw.githubusercontent.com/prem-sc/Regist/MONSTER/afk | grep $MYIP | awk '{print $3}')
+Exp1=$(curl -sS https://raw.githubusercontent.com/Valkry8/Regist/MONSTER/afk | grep $MYIP | awk '{print $3}')
 if [[ $today < $Exp1 ]]; then
 sts="${Info}"
 else
@@ -180,7 +180,7 @@ a=" ${z}ACCOUNT PREMIUM"
 BG_RED="\033[45;1m"
 echo -e " "
 echo -e " ${z}╭══════════════════════════════════════════════════════════╮${NC}"
-echo -e " ${z}│$NC\033[5;33m              KALONG - HEJO VPN                    $NC${z}│$NC"
+echo -e " ${z}│$NC\033[5;33m.          ꧁♦★ 𝐀𝐦𝐢𝐧 𝐖𝐞𝐛 𝐏𝐚𝐧𝐞𝐥 𝟐𝟎𝟐𝟔 ★♦꧂                $NC${z}│$NC"
 echo -e " ${z}╰══════════════════════════════════════════════════════════╯${NC}"
 echo -e " ${z}╭══════════════════════════════════════════════════════════╮${NC}"
 echo -e " ${z}│$NC • $NC${z} System OS ${NC}     ${z}=$NC $MODEL${NC}"
@@ -218,7 +218,7 @@ echo -e " ${z}╰═════════════════════
 #echo -e " ${z}│ ${NC}${z} SSH$NC : $status_ssh" "        ${z} NGINX$NC : $status_nginx" "        ${z} XRAY$NC : $status_xray      $NC${z}│$NC"
 #echo -e " ${z}│ ${NC}${z} WS-EPRO$NC : $status_ws_epro" "    ${z} DROPBEAR$NC : $status_dropbear" "     ${z} HAPROXY$NC : $status_haproxy   $NC${z}│$NC" #echo -e " ${z}╰════════════════╯╰══════════════════╯╰════════════════════╯${NC}"
 echo -e " ${z}╭══════════════════════════════════════════════════════════╮${NC}"
-echo -e " ${z}│$NC${z} Dev.Sc$NC        ${z}=$NC Kalong Hejo"
+echo -e " ${z}│$NC${z} Dev.Sc$NC        ${z}=$NC Amin Web Panel 2026"
 echo -e " ${z}│$NC${z} Client/Regist$NC ${z}=$NC $username [$sts]"
 echo -e " ${z}│$NC${z} Exp Script$NC    ${z}=$NC $exp / $certifacate Days$NC "
 echo -e " ${z}╰══════════════════════════════════════════════════════════╯${NC}"
