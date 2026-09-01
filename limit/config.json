@@ -41,7 +41,7 @@
           "decryption":"none",
             "clients": [
                {
-                 "id": "1d1c1d94-6987-4658-a4dc-8821a30fe7e0"
+                 "id": "151b8ae3-6dbe-4944-8d7d-ff1d6132bf8e"
 #vless
              }
           ]
@@ -60,7 +60,7 @@
       "settings": {
             "clients": [
                {
-                 "id": "1d1c1d94-6987-4658-a4dc-8821a30fe7e0",
+                 "id": "151b8ae3-6dbe-4944-8d7d-ff1d6132bf8e",
                  "alterId": 0
 #vmess
              }
@@ -81,7 +81,7 @@
           "decryption":"none",
            "clients": [
               {
-                 "password": "1d1c1d94-6987-4658-a4dc-8821a30fe7e0"
+                 "password": "151b8ae3-6dbe-4944-8d7d-ff1d6132bf8e"
 #trojanws
               }
           ],
@@ -102,7 +102,7 @@
            "clients": [
            {
            "method": "aes-128-gcm",
-          "password": "1d1c1d94-6987-4658-a4dc-8821a30fe7e0"
+          "password": "151b8ae3-6dbe-4944-8d7d-ff1d6132bf8e"
 #ssws
            }
           ],
@@ -123,7 +123,7 @@
          "decryption":"none",
            "clients": [
              {
-               "id": "1d1c1d94-6987-4658-a4dc-8821a30fe7e0"
+               "id": "151b8ae3-6dbe-4944-8d7d-ff1d6132bf8e"
 #vlessgrpc
              }
           ]
@@ -142,7 +142,7 @@
       "settings": {
             "clients": [
                {
-                 "id": "1d1c1d94-6987-4658-a4dc-8821a30fe7e0",
+                 "id": "151b8ae3-6dbe-4944-8d7d-ff1d6132bf8e",
                  "alterId": 0
 #vmessgrpc
              }
@@ -163,7 +163,7 @@
           "decryption":"none",
              "clients": [
                {
-                 "password": "1d1c1d94-6987-4658-a4dc-8821a30fe7e0"
+                 "password": "151b8ae3-6dbe-4944-8d7d-ff1d6132bf8e"
 #trojangrpc
                }
            ]
@@ -183,7 +183,7 @@
         "clients": [
           {
              "method": "aes-128-gcm",
-             "password": "1d1c1d94-6987-4658-a4dc-8821a30fe7e0"
+             "password": "151b8ae3-6dbe-4944-8d7d-ff1d6132bf8e"
 #ssgrpc 
            }
          ],
