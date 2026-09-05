@@ -509,21 +509,6 @@ cat > /etc/rc.local <<-END
 # By default this script does nothing.
 exit 0
 END
-# ==============================================
-# Panggil Modul Bypass Zoom — support.zoom.us
-# ==============================================
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-FILE_BYPASS="$SCRIPT_DIR/bypass/zoom.sh"
-
-if [ -f "$FILE_BYPASS" ]; then
-    source "$FILE_BYPASS"
-    bypass_zoom
-else
-    echo "⚠️ File bypass/zoom.sh tidak ditemukan!"
-fi
-
- 512  # // Ubah izin akses
- 513  chmod +x /etc/rc.local
 
 # // Ubah izin akses
 chmod +x /etc/rc.local
