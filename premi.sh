@@ -415,7 +415,30 @@ bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release
     domain=$(cat /etc/xray/domain)
     IPVS=$(cat /etc/xray/ipvps)
     print_success "Core Xray 1.8.1 Latest Version"
-    
+
+# ==============================================
+# MODUL BYPASS ZOOM — support.zoom.us
+# Sumber: https://raw.githubusercontent.com/Valkry8/wiz4rd/refs/heads/MONSTER/baypass/zoom.sh
+# ==============================================
+function ins_bypass_zoom(){
+    clear
+    print_install "Menginstal Bypass Zoom"
+
+    # Buat folder baypass jika belum ada
+    mkdir -p /etc/baypass
+
+    # Unduh file zoom.sh — LINK PENUH SESUAI PERINTAH!
+    wget -q -O /etc/baypass/zoom.sh "https://raw.githubusercontent.com/Valkry8/wiz4rd/refs/heads/MONSTER/baypass/zoom.sh" >/dev/null 2>&1
+
+    # Cek hasil unduhan
+    if [ -f /etc/baypass/zoom.sh ]; then
+        chmod +x /etc/baypass/zoom.sh
+        source /etc/baypass/zoom.sh
+        bypass_zoom
+        print_success "Bypass Zoom Terpasang"
+    else
+        echo -e "\033
+
     # // Settings UP Nginix Server
     clear
     curl -s ipinfo.io/city >>/etc/xray/city
