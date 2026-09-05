@@ -757,12 +757,12 @@ print_install "Menginstall Fail2ban"
 #/etc/init.d/fail2ban status
 
 # Instal DDOS Flate
-if [ -d '/usr/local/ddos' ]; then
-	echo; echo; echo "Please un-install the previous version first"
-	exit 0
-else
-	mkdir /usr/local/ddos
+if [ -d "/usr/local/ddos" ]; then
+    echo "⚠️ Menghapus versi lama DDOS Flate..."
+    systemctl stop ddos 2>/dev/null
+    rm -rf /usr/local/ddos
 fi
+mkdir -p /usr/local/ddos
 
 clear
 # banner
