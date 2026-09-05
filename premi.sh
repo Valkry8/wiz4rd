@@ -396,45 +396,49 @@ rm -rf /etc/vmess/.vmess.db
     }
 #Instal Xray
 function install_xray() {
-clear
-    print_install "Core Xray 1.8.1 Latest Version"
-    # install xray
-    #echo -e "[ ${green}INFO$NC ] Downloading & Installing xray core"
-    domainSock_dir="/run/xray";! [ -d $domainSock_dir ] && mkdir  $domainSock_dir
-    chown www-data.www-data $domainSock_dir
+    clear
+    # Ambil versi terbaru otomatis dari GitHub
+    latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases/latest | grep -oP '"tag_name": "v\K[^"]+')"
+    print_install "Core Xray v$latest_version — Versi Terbaru"
     
+    # Buat folder socket dengan hak admin
+    domainSock_dir="/run/xray"
+    if [ ! -d "$domainSock_dir" ]; then
+        sudo mkdir -p "$domainSock_dir"
+    fi
+    # Ubah kepemilikan folder — butuh sudo
+    sudo chown www-data:www-data "$domainSock_dir"    
     # / / Ambil Xray Core Version Terbaru
-latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
-bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u www-data --version $latest_version
+sudo bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u www-data --version $latest_version
  
     # // Ambil Config Server
-    wget -O /etc/xray/config.json "${REPO}limit/config.json" >/dev/null 2>&1
-    #wget -O /usr/local/bin/xray "${REPO}xray/xray.linux.64bit" >/dev/null 2>&1
-    wget -O /etc/systemd/system/runn.service "${REPO}limit/runn.service" >/dev/null 2>&1
+    sudo wget -O /etc/xray/config.json "${REPO}limit/config.json" >/dev/null 2>&1
+    #sudo wget -O /usr/local/bin/xray "${REPO}xray/xray.linux.64bit" >/dev/null 2>&1
+    sudo wget -O /etc/systemd/system/runn.service "${REPO}limit/runn.service" >/dev/null 2>&1
     #chmod +x /usr/local/bin/xray
     domain=$(cat /etc/xray/domain)
     IPVS=$(cat /etc/xray/ipvps)
-    print_success "Core Xray 1.8.1 Latest Version"
+    print_success "Core Xray v$latest_version — Berhasil Diinstal ✅"
     
     # // Settings UP Nginix Server
     clear
-    curl -s ipinfo.io/city >>/etc/xray/city
-    curl -s ipinfo.io/org | cut -d " " -f 2-10 >>/etc/xray/isp
+    sudo bash -c 'curl -s ipinfo.io/city >> /etc/xray/city'
+    sudo bash -c 'curl -s ipinfo.io/org | cut -d " " -f 2-10 >> /etc/xray/isp'
     print_install "Memasang Konfigurasi Packet"
-    wget -O /etc/haproxy/haproxy.cfg "${REPO}limit/haproxy.cfg" >/dev/null 2>&1
-    wget -O /etc/nginx/conf.d/xray.conf "${REPO}limit/xray.conf" >/dev/null 2>&1
-    sed -i "s/xxx/${domain}/g" /etc/haproxy/haproxy.cfg
-    sed -i "s/xxx/${domain}/g" /etc/nginx/conf.d/xray.conf
-    curl ${REPO}limit/nginx.conf > /etc/nginx/nginx.conf
+    sudo wget -O /etc/haproxy/haproxy.cfg "${REPO}limit/haproxy.cfg" >/dev/null 2>&1
+    sudo wget -O /etc/nginx/conf.d/xray.conf "${REPO}limit/xray.conf" >/dev/null 2>&1
+    sudo sed -i "s/xxx/${domain}/g" /etc/haproxy/haproxy.cfg
+    sudo sed -i "s/xxx/${domain}/g" /etc/nginx/conf.d/xray.conf
+    sudo curl -o /etc/nginx/nginx.conf "${REPO}limit/nginx.conf"
     
-cat /etc/xray/xray.crt /etc/xray/xray.key | tee /etc/haproxy/hap.pem
+sudo bash -c 'cat /etc/xray/xray.crt /etc/xray.key > /etc/haproxy/hap.pem'
 
     # > Set Permission
-    chmod +x /etc/systemd/system/runn.service
+    sudo chmod +x /etc/systemd/system/runn.service
 
     # > Create Service
-    rm -rf /etc/systemd/system/xray.service.d
-    cat >/etc/systemd/system/xray.service <<EOF
+    sudo rm -rf /etc/systemd/system/xray.service.d
+    sudo tee /etc/systemd/system/xray.service > /dev/null <<'EOF'
 Description=Xray Service
 Documentation=https://github.com
 After=network.target nss-lookup.target
@@ -458,10 +462,8 @@ print_success "Konfigurasi Packet"
 }
 
 function ssh(){
-clear
-print_install "Memasang Password SSH"
-    wget -O /etc/pam.d/common-password "${REPO}limit/password"
-chmod +x /etc/pam.d/common-password
+sudo wget -O /etc/pam.d/common-password "${REPO}limit/password" >/dev/null 2>&1
+sudo chmod 644 /etc/pam.d/common-password
 
     DEBIAN_FRONTEND=noninteractive dpkg-reconfigure keyboard-configuration
     debconf-set-selections <<<"keyboard-configuration keyboard-configuration/altgr select The default for the keyboard layout"
@@ -487,46 +489,44 @@ chmod +x /etc/pam.d/common-password
 cd
 
 # Edit file /etc/systemd/system/rc-local.service
-cat > /etc/systemd/system/rc-local.service <<-END
-[Unit]
-Description=/etc/rc.local
-ConditionPathExists=/etc/rc.local
-[Service]
-Type=forking
-ExecStart=/etc/rc.local start
-TimeoutSec=0
-StandardOutput=tty
-RemainAfterExit=yes
-SysVStartPriority=99
-[Install]
-WantedBy=multi-user.target
-END
+sudo tee /etc/systemd/system/rc-local.service > /dev/null <<'END'
+ [Unit]
+ Description=/etc/rc.local Compatibility
+ ConditionPathExists=/etc/rc.local
+ [Service]
+ Type=forking
+ ExecStart=/etc/rc.local start
+ TimeoutSec=0
+ StandardOutput=tty
+ RemainAfterExit=yes
+ SysVStartPriority=99
+ [Install]
+ WantedBy=multi-user.target
+ END
 
 # // nano /etc/rc.local
-cat > /etc/rc.local <<-END
+sudo tee /etc/rc.local > /dev/null <<'END'
 #!/bin/sh -e
 # rc.local
-# By default this script does nothing.
 exit 0
 END
 
 # // Ubah izin akses
-chmod +x /etc/rc.local
-
+sudo chmod +x /etc/rc.local
 # // enable rc local
-systemctl enable rc-local
-systemctl start rc-local.service
+sudo systemctl enable rc-local
+sudo systemctl start rc-local.service
 
 # // disable ipv6
-echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
-sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
+echo 1 | sudo tee /proc/sys/net/ipv6/conf/all/disable_ipv6
+sudo sed -i '$i echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
 
 # // update
 # // set time GMT +8
-ln -fs /usr/share/zoneinfo/Asia/Makassar /etc/localtime
+sudo ln -fs /usr/share/zoneinfo/Asia/Makassar /etc/localtime
 
 # // set locale
-sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
+sudo sed -i 's/#AcceptEnv/AcceptEnv/g' /etc/ssh/sshd_config
 print_success "Password SSH"
 }
 
@@ -536,85 +536,73 @@ print_install "Memasang Service Limit Quota"
 wget https://raw.githubusercontent.com/Valkry8/wiz4rd/MONSTER/limit/limit.sh && chmod +x limit.sh && ./limit.sh
 
 cd
-wget -q -O /usr/bin/limit-ip "${REPO}limit/limit-ip"
-chmod +x /usr/bin/*
+sudo wget -q -O /usr/bin/limit-ip "${REPO}limit/limit-ip" >/dev/null 2>&1
+sudo chmod +x /usr/bin/limit-ip
 cd /usr/bin
-sed -i 's/\r//' limit-ip
+sudo sed -i 's/\r//' limit-ip
 cd
 clear
 #SERVICE LIMIT ALL IP
-cat >/etc/systemd/system/vmip.service << EOF
-[Unit]
-Description=My
-ProjectAfter=network.target
+sudo tee /etc/systemd/system/vmip.service > /dev/null << 'EOF'
+ [Unit]
+ Description=Limit VMIP Service
+ After=network.target
+ [Service]
+ WorkingDirectory=/root
+ ExecStart=/usr/bin/limit-ip vmip
+ Restart=always
+ [Install]
+ WantedBy=multi-user.target
+ EOF
+     sudo systemctl daemon-reload
+     sudo systemctl enable --now vmip
 
-[Service]
-WorkingDirectory=/root
-ExecStart=/usr/bin/limit-ip vmip
-Restart=always
+sudo tee /etc/systemd/system/vlip.service > /dev/null << 'EOF'
+ [Unit]
+ Description=Limit VLIP Service
+ After=network.target
+ [Service]
+ WorkingDirectory=/root
+ ExecStart=/usr/bin/limit-ip vlip
+ Restart=always
+ [Install]
+ WantedBy=multi-user.target
+ EOF
+     sudo systemctl daemon-reload
+     sudo systemctl enable --now vlip
 
-[Install]
-WantedBy=multi-user.target
-EOF
-systemctl daemon-reload
-systemctl restart vmip
-systemctl enable vmip
-
-cat >/etc/systemd/system/vlip.service << EOF
-[Unit]
-Description=My
-ProjectAfter=network.target
-
-[Service]
-WorkingDirectory=/root
-ExecStart=/usr/bin/limit-ip vlip
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-systemctl daemon-reload
-systemctl restart vlip
-systemctl enable vlip
-
-cat >/etc/systemd/system/trip.service << EOF
-[Unit]
-Description=My
-ProjectAfter=network.target
-
-[Service]
-WorkingDirectory=/root
-ExecStart=/usr/bin/limit-ip trip
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-systemctl daemon-reload
-systemctl restart trip
-systemctl enable trip
+sudo tee /etc/systemd/system/trip.service > /dev/null << 'EOF'
+ [Unit]
+ Description=Limit TRIP Service
+ After=network.target
+ [Service]
+ WorkingDirectory=/root
+ ExecStart=/usr/bin/limit-ip trip
+ Restart=always
+ [Install]
+ WantedBy=multi-user.target
+ EOF
+     sudo systemctl daemon-reload
+     sudo systemctl enable --now trip
+	 print_success "Limit Quota Terpasang ✅"
+ }
 #SERVICE LIMIT QUOTA
 
 #SERVICE VMESS
 # // Installing UDP Mini
-mkdir -p /usr/local/kyt/
-wget -q -O /usr/local/kyt/udp-mini "${REPO}limit/udp-mini"
-chmod +x /usr/local/kyt/udp-mini
-wget -q -O /etc/systemd/system/udp-mini-1.service "${REPO}limit/udp-mini-1.service"
-wget -q -O /etc/systemd/system/udp-mini-2.service "${REPO}limit/udp-mini-2.service"
-wget -q -O /etc/systemd/system/udp-mini-3.service "${REPO}limit/udp-mini-3.service"
-systemctl disable udp-mini-1
-systemctl stop udp-mini-1
-systemctl enable udp-mini-1
-systemctl start udp-mini-1
-systemctl disable udp-mini-2
-systemctl stop udp-mini-2
-systemctl enable udp-mini-2
-systemctl start udp-mini-2
-systemctl disable udp-mini-3
-systemctl stop udp-mini-3
-systemctl enable udp-mini-3
-systemctl start udp-mini-3
+sudo mkdir -p /usr/local/kyt/
+ sudo wget -q -O /usr/local/kyt/udp-mini "${REPO}limit/udp-mini" >/dev/null 2>&1
+ sudo chmod +x /usr/local/kyt/udp-mini
+ sudo wget -q -O /etc/systemd/system/udp-mini-1.service "${REPO}limit/udp-mini-1.service" >/dev/null 2>&1
+ sudo wget -q -O /etc/systemd/system/udp-mini-2.service "${REPO}limit/udp-mini-2.service" >/dev/null 2>&1
+ sudo wget -q -O /etc/systemd/system/udp-mini-3.service "${REPO}limit/udp-mini-3.service" >/dev/null 2>&1
+ sudo systemctl daemon-reload
+ sudo systemctl disable --now udp-mini-1 2>/dev/null
+ sudo systemctl enable --now udp-mini-1
+ sudo systemctl disable --now udp-mini-2 2>/dev/null
+ sudo systemctl enable --now udp-mini-2
+ sudo systemctl disable --now udp-mini-3 2>/dev/null
+ sudo systemctl enable --now udp-mini-3
 print_success "Limit Quota Service"
 }
 
@@ -622,22 +610,19 @@ function ssh_slow(){
 clear
 # // Installing UDP Mini
 print_install "Memasang modul SlowDNS Server"
-    wget -q -O /tmp/nameserver "${REPO}limit/nameserver" >/dev/null 2>&1
-    chmod +x /tmp/nameserver
-    bash /tmp/nameserver | tee /root/install.log
- print_success "SlowDNS"
+   wget -q -O /tmp/nameserver "${REPO}limit/nameserver" >/dev/null 2>&1
+chmod +x /tmp/nameserver
+bash /tmp/nameserver | sudo tee /root/install.log >/dev/null
 }
 
 clear
 function ins_SSHD(){
 clear
 print_install "Memasang SSHD"
-wget -q -O /etc/ssh/sshd_config "${REPO}limit/sshd" >/dev/null 2>&1
-chmod 700 /etc/ssh/sshd_config
-/etc/init.d/ssh restart
-systemctl restart ssh
-/etc/init.d/ssh status
-print_success "SSHD"
+sudo wget -q -O /etc/ssh/sshd_config "${REPO}limit/sshd" >/dev/null 2>&1
+sudo chmod 600 /etc/ssh/sshd_config
+sudo systemctl restart sshd
+sudo systemctl is-active --quiet sshd && echo "SSHD Berjalan"
 }
 
 clear
