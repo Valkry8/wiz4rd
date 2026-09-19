@@ -87,11 +87,8 @@ green='\e[0;32m'
 NC='\e[0m'
 #IZIN SCRIPT
 MYIP=$(curl -sS ipv4.icanhazip.com)
+MYIPV6=$(curl -sS ipv6.icanhazip.com)
 echo -e "\e[32mloading...\e[0m"
-clear
-#IZIN SCRIPT
-MYIP=$(curl -sS ipv4.icanhazip.com)
-echo -e "\e[32mloading...\e[0m" 
 clear
 # Version sc
 clear
@@ -177,7 +174,10 @@ function is_root() {
 # Buat direktori xray
 print_install "Membuat direktori xray"
     mkdir -p /etc/xray
-    curl -s ifconfig.me > /etc/xray/ipvps
+    IPV4=$(curl -sS ifconfig.me)
+    IPV6=$(curl -sS --connect-timeout 3 ipv6.icanhazip.com)
+    echo "$IPV4" > /etc/xray/ipvps
+    [ -n "$IPV6" ] && echo "$IPV6" >> /etc/xray/ipvps
     touch /etc/xray/domain
     mkdir -p /var/log/xray
     chown www-data.www-data /var/log/xray
@@ -205,25 +205,26 @@ print_install "Membuat direktori xray"
 
 # Change Environment System
 function first_setup(){
-    timedatectl set-timezone Asia/Jakarta
+    timedatectl set-timezone Asia/Gorontalo
     echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
     echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
     print_success "Directory Xray"
     if [[ $(cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g') == "ubuntu" ]]; then
     echo "Setup Dependencies $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')"
     sudo apt update -y
-    apt-get install --no-install-recommends software-properties-common
-    add-apt-repository ppa:vbernat/haproxy-2.0 -y
-    apt-get -y install haproxy=2.0.\*
+    apt-get install --no-install-recommends -y software-properties-common
+    add-apt-repository ppa:vbernat/haproxy-2.8 -y
+	apt-get update
+    apt-get -y install haproxy=2.8.\*
 elif [[ $(cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g') == "debian" ]]; then
     echo "Setup Dependencies For OS Is $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')"
     curl https://haproxy.debian.net/bernat.debian.org.gpg |
         gpg --dearmor >/usr/share/keyrings/haproxy.debian.net.gpg
     echo deb "[signed-by=/usr/share/keyrings/haproxy.debian.net.gpg]" \
-        http://haproxy.debian.net buster-backports-1.8 main \
+        http://haproxy.debian.net buster-backports-2.8 main \
         >/etc/apt/sources.list.d/haproxy.list
     sudo apt-get update
-    apt-get -y install haproxy=1.8.\*
+    apt-get -y install haproxy=2.8.\*
 else
     echo -e " Your OS Is Not Supported ($(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g') )"
     exit 1
@@ -397,15 +398,15 @@ rm -rf /etc/vmess/.vmess.db
 #Instal Xray
 function install_xray() {
 clear
-    print_install "Core Xray 1.8.1 Latest Version"
+    print_install "Core Xray Terbaru"
     # install xray
     #echo -e "[ ${green}INFO$NC ] Downloading & Installing xray core"
     domainSock_dir="/run/xray";! [ -d $domainSock_dir ] && mkdir  $domainSock_dir
     chown www-data.www-data $domainSock_dir
     
     # / / Ambil Xray Core Version Terbaru
-latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
-bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u www-data --version $latest_version
+latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases/latest | grep -o '"tag_name":"[^"]*"' | sed -E 's/.*"v([^"]+)".*/\1/')"
+bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u www-data --version "v$latest_version"
  
     # // Ambil Config Server
     wget -O /etc/xray/config.json "${REPO}limit/config.json" >/dev/null 2>&1
@@ -414,7 +415,7 @@ bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release
     #chmod +x /usr/local/bin/xray
     domain=$(cat /etc/xray/domain)
     IPVS=$(cat /etc/xray/ipvps)
-    print_success "Core Xray 1.8.1 Latest Version"
+    print_success "Core Xray v$latest_version Latest Version"
     
     # // Settings UP Nginix Server
     clear
@@ -519,11 +520,12 @@ systemctl start rc-local.service
 
 # // disable ipv6
 echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
-sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
+sed -i '/disable_ipv6/d' /etc/rc.local
+sed -i '$ i\echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
 
 # // update
-# // set time GMT +7
-ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+# // set time GMT +8
+ln -fs /usr/share/zoneinfo/Asia/Makassar /etc/localtime
 
 # // set locale
 sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
