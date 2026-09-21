@@ -1,38 +1,92 @@
 #!/bin/bash
-function send_log(){
-CHATID=$(grep -E "^#bot# " "/etc/bot/.bot.db" | cut -d ' ' -f 3)
-KEY=$(grep -E "^#bot# " "/etc/bot/.bot.db" | cut -d ' ' -f 2)
-TIME="10"
-URL="https://api.telegram.org/bot$KEY/sendMessage"
-TEXT="
-<code>────────────────────</code>
-<b>⚠️ NOTIFICATIONS MULTI LOGIN SSH ⚠️</b>
-<code>────────────────────</code>
-<code>Username  : </code><code>$user</code>
-<code>Limit Ip    : </code><code>$iplimit</code>
-<code>────────────────────</code>
-"
-curl -s --max-time $TIME -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+set -euo pipefail
+
+# === Konfigurasi ===
+DB_FILE="/etc/bot/.bot.db"
+SSH_IP_DIR="/etc/kyt/limit/ssh/ip"
+SSH_LOG_FILE="/etc/kyt/log/ssh/ssh.log"
+TIME_OUT=10
+
+# === Fungsi Baca Data Bot ===
+read_bot_config() {
+    local line
+    line=$(grep -E "^#bot# " "$DB_FILE" 2>/dev/null | head -n 1)
+    if [[ -z "$line" ]]; then
+        echo "ERROR: Data bot tidak ditemukan di $DB_FILE" >&2
+        return 1
+    fi
+    BOT_KEY=$(echo "$line" | awk '{print $2}')
+    CHAT_ID=$(echo "$line" | awk '{print $3}')
+    if [[ -z "$BOT_KEY" || -z "$CHAT_ID" ]]; then
+        echo "ERROR: Format data bot salah" >&2
+        return 1
+    fi
 }
-mulog=$(member)
-date=$(date)
-data=( `ls /etc/kyt/limit/ssh/ip`);
-for user in "${data[@]}"
-do
-iplimit=$(cat /etc/kyt/limit/ssh/ip/$user)
-cekcek=$(echo -e "$mulog" | grep $user | wc -l);
-if [[ $cekcek -gt $iplimit ]]; then
-userdel -f -r $user
-nais=3
-echo -e "$waktu\nRemoved User: $user Login: $cekcek IP Max: $ip IP \n" >> /etc/kyt/log/ssh/ssh.log
-else
-echo > /dev/null
-fi
-sleep 30
+
+# === Fungsi Ambil Daftar Login ===
+get_member_logins() {
+    # Sesuaikan dengan perintah/fungsi asli kamu
+    # Contoh baca dari file log:
+    cat /var/log/auth.log 2>/dev/null | grep 'sshd.*Accepted' | awk '{print $9}'
+}
+
+# === Fungsi Kirim Notifikasi Telegram ===
+send_log() {
+    local user="$1"
+    local iplimit="$2"
+    local login_count="$3"
+
+    read_bot_config || return 0
+
+    local URL="https://api.telegram.org/bot${BOT_KEY}/sendMessage"
+    local TEXT="
+<code>────────────────────</code>
+<b>⚠️  BATAS IP TERLAMPAU ⚠️</b>
+<code>────────────────────</code>
+<code>Pengguna : </code><code>${user}</code>
+<code>Batas IP : </code><code>${iplimit}</code>
+<code>Login IP : </code><code>${login_count}</code>
+<code>────────────────────</code>
+<code>Akun telah dihapus!</code>
+"
+    curl -s --max-time "$TIME_OUT" -d "chat_id=${CHAT_ID}&disable_web_page_preview=1&text=${TEXT}&parse_mode=html" "$URL" >/dev/null 2>&1
+}
+
+# === MULAI PROSES ===
+mkdir -p "$(dirname "$SSH_LOG_FILE")"
+MULOG=$(get_member_logins)
+DATE_NOW=$(date '+%Y-%m-%d %H:%M:%S')
+NAIS=0
+
+# Ambil daftar user dengan aman
+shopt -s nullglob
+user_list=("$SSH_IP_DIR"/*)
+
+for ip_file in "${user_list[@]}"; do
+    user=$(basename "$ip_file")
+    iplimit=$(cat "$ip_file")
+    # Hitung jumlah login dengan aman
+    login_count=$(echo "$MULOG" | grep -cxF "$user" || echo 0)
+
+    if [[ "$login_count" -gt "$iplimit" ]]; then
+        # Hapus pengguna
+        if id "$user" &>/dev/null; then
+            userdel -f -r "$user" &>/dev/null || true
+        fi
+        # Catat log
+        echo "[$DATE_NOW] DIHAPUS: $user | Login=$login_count | Batas=$iplimit" >> "$SSH_LOG_FILE"
+        NAIS=$((NAIS + 1))
+        # Kirim notifikasi langsung per user
+        send_log "$user" "$iplimit" "$login_count"
+    fi
 done
-if [[ $nais -gt 1 ]]; then
-send_log
-telegram-send --pre "$(log-ssh)" > /dev/null & 
-else
-echo > /dev/null
+shopt -u nullglob
+
+# Notifikasi ringkasan
+if [[ "$NAIS" -gt 0 ]]; then
+    SUMMARY_TEXT="✅ Pemeriksaan selesai — $NAIS akun telah dibatasi/dihapus"
+    # Kirim ringkasan jika perlu
+    read_bot_config 2>/dev/null && curl -s --max-time "$TIME_OUT" -d "chat_id=${CHAT_ID}&text=${SUMMARY_TEXT}" "https://api.telegram.org/bot${BOT_KEY}/sendMessage" >/dev/null 2>&1
 fi
+
+exit 0
