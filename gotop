@@ -1,4 +1,43 @@
-gotop_latest="$(curl -s https://api.github.com/repos/xxxserxxx/gotop/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
-    gotop_link="https://github.com/xxxserxxx/gotop/releases/download/v$gotop_latest/gotop_v"$gotop_latest"_linux_amd64.deb"
-    curl -sL "$gotop_link" -o /tmp/gotop.deb
-    dpkg -i /tmp/gotop.deb >/dev/null 2>&1
+#!/bin/bash
+set -euo pipefail
+
+# Ambil versi terbaru dari GitHub API
+echo "🔍 Mencari versi terbaru gotop..."
+gotop_latest="$(curl -s https://api.github.com/repos/xxxserxxx/gotop/releases \
+  | grep -o '"tag_name": "v[^"]*"' \
+  | head -n 1 \
+  | sed -E 's/.*"v([^"]+)".*/\1/')"
+
+if [ -z "$gotop_latest" ]; then
+  echo "❌ Gagal mendapatkan informasi versi!"
+  exit 1
+fi
+
+echo "✅ Versi terbaru: v$gotop_latest"
+
+# Bentuk tautan dengan kutipan yang benar
+gotop_link="https://github.com/xxxserxxx/gotop/releases/download/v${gotop_latest}/gotop_v${gotop_latest}_linux_amd64.deb"
+echo "📥 Mengunduh: $gotop_link"
+
+# Unduh dengan verifikasi
+curl -sL -w "%{http_code}" "$gotop_link" -o /tmp/gotop.deb | grep -q "200" || {
+  echo "❌ Gagal mengunduh! Tautan rusak atau jaringan bermasalah."
+  rm -f /tmp/gotop.deb
+  exit 1
+}
+
+# Cek ukuran file minimal
+if [ ! -s /tmp/gotop.deb ]; then
+  echo "❌ File unduhan kosong!"
+  rm -f /tmp/gotop.deb
+  exit 1
+fi
+
+# Pasang paket
+echo "📦 Memasang gotop..."
+dpkg -i /tmp/gotop.deb
+
+# Bersihkan
+rm -f /tmp/gotop.deb
+
+echo -e "\n✅ Selesai! Jalankan perintah: gotop"
