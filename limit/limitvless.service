@@ -1,12 +1,34 @@
 [Unit]
-Description=Limit Usage Xray Service
+Description=Limit Usage Xray - VLESS
 Documentation=FighterTunnel
-After=syslog.target network-online.target
+Wants=network-online.target
+After=network.target network-online.target syslog.target
 
 [Service]
+Type=simple
 User=root
-NoNewPrivileges=true
+Group=root
+
 ExecStart=/etc/xray/limit.vless
+
+# Restart otomatis jika gagal
+Restart=always
+RestartSec=5
+
+# Pengamanan sistem
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+PrivateTmp=true
+PrivateDevices=true
+
+# Izinkan akses folder yang dibutuhkan
+ReadWritePaths=/etc/xray/
+ReadWritePaths=/var/log/
 
 [Install]
 WantedBy=multi-user.target
+
